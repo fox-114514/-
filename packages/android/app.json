@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#11052c"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.cloudasset.app"
@@ -22,8 +24,19 @@
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#11052c"
       },
-      "permissions": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
-    "plugins": ["expo-document-picker"]
+    "plugins": [
+      "expo-document-picker"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "bc665de4-ecd7-44a3-bfbe-4d358d5840b5"
+      }
+    },
+    "owner": "foxylittlefox"
   }
 }
