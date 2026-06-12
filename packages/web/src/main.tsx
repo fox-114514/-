@@ -6,6 +6,7 @@ import AssetList from './pages/AssetList';
 import AssetDetail from './pages/AssetDetail';
 import Upload from './pages/Upload';
 import ShareManager from './pages/ShareManager';
+import ShareLanding from './pages/ShareLanding';
 import './styles/global.css';
 
 const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -23,6 +24,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Route path="/upload" element={<RequireAuth><Upload /></RequireAuth>} />
         <Route path="/assets/:id" element={<RequireAuth><AssetDetail /></RequireAuth>} />
         <Route path="/shares" element={<RequireAuth><ShareManager /></RequireAuth>} />
+        <Route path="/s/:token" element={<ShareLanding />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </HashRouter>
