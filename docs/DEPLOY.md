@@ -1,6 +1,14 @@
 # CloudAsset Docker/VPS 部署指南
 
-推荐部署方式：VPS + Docker Compose + Caddy HTTPS 反代。
+最快测试方式是 IP 直连一键部署，默认端口 `18080`：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/fox-114514/-/main/deploy/install-ip.sh | bash
+```
+
+详细见 [一键 IP 直连部署](QUICK_DEPLOY.md)。
+
+生产环境推荐：VPS + Docker Compose + Caddy HTTPS 反代。
 
 ## 1. 服务器要求
 
@@ -53,7 +61,7 @@ nano .env
 ```bash
 API_KEY=<强随机字符串>
 PUBLIC_BASE_URL=https://asset.example.com
-WEB_PORT=8080
+WEB_PORT=18080
 ```
 
 启动：
@@ -85,7 +93,7 @@ API_KEY=<强随机字符串>
 PUBLIC_BASE_URL=https://asset.example.com
 CLOUDASSET_SERVER_IMAGE=ghcr.io/<owner>/<repo>-server:main
 CLOUDASSET_WEB_IMAGE=ghcr.io/<owner>/<repo>-web:main
-WEB_PORT=8080
+WEB_PORT=18080
 ```
 
 启动：
@@ -107,7 +115,7 @@ sudo nano /etc/caddy/Caddyfile
 
 ```caddyfile
 asset.example.com {
-    reverse_proxy 127.0.0.1:8080
+    reverse_proxy 127.0.0.1:18080
 }
 ```
 

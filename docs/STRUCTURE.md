@@ -63,6 +63,8 @@ cloudasset/
 │           └── screens/
 │
 ├── deploy/
+│   ├── install-ip.sh             # IP 直连一键部署
+│   ├── update-ip.sh              # IP 直连部署更新
 │   ├── nginx.conf
 │   ├── nginx.web.conf
 │   └── cloudasset.service

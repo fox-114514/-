@@ -69,7 +69,7 @@ nano .env
 API_KEY=<粘贴上面生成的 64 位 hex>
 PUBLIC_BASE_URL=https://asset.example.com
 MAX_UPLOAD_MB=1024
-WEB_PORT=8080
+WEB_PORT=18080
 ```
 
 ## 五、启动服务
@@ -99,7 +99,7 @@ sudo apt install -y caddy
 # 2) 配置 /etc/caddy/Caddyfile
 sudo tee /etc/caddy/Caddyfile > /dev/null <<EOF
 asset.example.com {
-    reverse_proxy 127.0.0.1:8080
+    reverse_proxy 127.0.0.1:18080
 }
 EOF
 
@@ -170,7 +170,7 @@ docker compose up -d --build
 | 80 | HTTP (Caddy/Nginx 自动跳转 HTTPS) | 对外 |
 | 443 | HTTPS | 对外 |
 | 3000 | 后端直连 | **不对外**（仅 docker 内网） |
-| 8080 | Web 容器（80 端口） | 不直接对外，由 Caddy/Nginx 代理 |
+| 18080 | Web 容器（80 端口） | 不直接对外，由 Caddy/Nginx 代理 |
 
 云服务商安全组只需开放 22 / 80 / 443。
 

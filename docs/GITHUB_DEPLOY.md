@@ -80,7 +80,7 @@ API_KEY=<强随机字符串>
 PUBLIC_BASE_URL=https://asset.example.com
 CLOUDASSET_SERVER_IMAGE=ghcr.io/<owner>/<repo>-server:main
 CLOUDASSET_WEB_IMAGE=ghcr.io/<owner>/<repo>-web:main
-WEB_PORT=8080
+WEB_PORT=18080
 MAX_UPLOAD_MB=512
 ```
 
@@ -103,7 +103,7 @@ docker compose -f docker-compose.prod.yml logs -f
 
 ```caddyfile
 asset.example.com {
-    reverse_proxy 127.0.0.1:8080
+    reverse_proxy 127.0.0.1:18080
 }
 ```
 
