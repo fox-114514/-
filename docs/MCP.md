@@ -35,6 +35,7 @@ node packages/server/dist/mcp/stdio.js
 curl -X POST https://asset.example.com/mcp \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
+  -H "Authorization: Bearer <your-api-key>" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
 ```
 
@@ -45,11 +46,16 @@ curl -X POST https://asset.example.com/mcp \
   "mcpServers": {
     "cloudasset": {
       "type": "http",
-      "url": "https://asset.example.com/mcp"
+      "url": "https://asset.example.com/mcp",
+      "headers": {
+        "Authorization": "Bearer your-api-key"
+      }
     }
   }
 }
 ```
+
+也可以使用 `X-API-Key: <your-api-key>`。
 
 ---
 
@@ -144,7 +150,7 @@ curl -X POST https://asset.example.com/mcp \
 
 1. Agent 接到任务："把这张产品图加上 2024 角标"
 2. `list_assets({ category: "image", q: "product" })` 找到原图
-3. `read_asset({ id })` 取出 base64
-4. （在 Agent 内部用图像模型处理）
+3. `get_asset({ id })` 查看元数据；文本类资产可用 `read_asset({ id })` 读取内容
+4. Agent 在本地或其他工具中处理文件
 5. `upload_asset({ ..., content_base64: "new..." , tags: ["v2"] })` 上传新版本
 6. `share_asset({ id })` 拿分享链接返回给用户

@@ -14,7 +14,7 @@ export default function App() {
   const [initial, setInitial] = useState<string | null>(null);
 
   useEffect(() => {
-    setInitial(getKey() ? 'List' : 'Login');
+    getKey().then(key => setInitial(key ? 'List' : 'Login'));
   }, []);
 
   if (!initial) return null;

@@ -1,12 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { api, type Asset, clearKey, formatDate, formatSize } from '../api/client';
+import { api, fetchAssetBlobUrl, type Asset, clearKey, formatDate, formatSize } from '../api/client';
 
 const CATEGORIES = ['image', 'video', 'audio', 'document', 'code', 'data', 'other'];
 
 function Thumb({ a }: { a: Asset }) {
+  const [src, setSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!a.mime_type.startsWith('image/')) return;
+    let alive = true;
+    let objectUrl: string | null = null;
+    fetchAssetBlobUrl(a.id).then(url => {
+      objectUrl = url;
+      if (alive) setSrc(url);
+    }).catch(() => {
+      if (alive) setSrc(null);
+    });
+    return () => {
+      alive = false;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [a.id, a.mime_type]);
+
   if (a.mime_type.startsWith('image/')) {
-    return <div className="asset-thumb"><img src={api.contentUrl(a.id)} alt={a.name} loading="lazy" /></div>;
+    return <div className="asset-thumb">{src ? <img src={src} alt={a.name} loading="lazy" /> : 'image'}</div>;
   }
   const icon = a.category === 'video' ? '🎬' : a.category === 'audio' ? '🎵' : a.category === 'code' ? '💻' : a.category === 'document' ? '📄' : a.category === 'data' ? '📊' : '📁';
   return <div className="asset-thumb">{icon}</div>;

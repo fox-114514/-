@@ -87,8 +87,13 @@ export async function safeUnlink(p: string): Promise<void> {
 }
 
 export function absPathOf(storagePath: string): string {
-  const safe = path.normalize(storagePath).replace(/^(\.\.[/\\])+/, '');
-  return path.join(config.storageRoot, safe);
+  const root = path.resolve(config.storageRoot);
+  const target = path.resolve(root, storagePath);
+  const rel = path.relative(root, target);
+  if (rel.startsWith('..') || path.isAbsolute(rel)) {
+    throw new Error('Invalid storage path');
+  }
+  return target;
 }
 
 export async function deleteFile(storagePath: string): Promise<void> {

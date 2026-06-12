@@ -17,7 +17,7 @@ export default function ShareManager() {
   useEffect(() => { load(); }, []);
 
   const copy = (token: string) => {
-    navigator.clipboard.writeText(`${location.origin}/api/share/${token}`);
+    navigator.clipboard.writeText(api.publicShareUrl(token));
     alert('已复制');
   };
 
@@ -49,7 +49,7 @@ export default function ShareManager() {
                 <div className="asset-name" style={{ marginBottom: 6 }}>{a.name}</div>
                 <div style={{ fontSize: '0.78rem', color: '#9ca3af', marginBottom: 8 }}>分享于 {formatDate(a.updated_at)}</div>
                 <code style={{ display: 'block', fontSize: '0.78rem', wordBreak: 'break-all', background: 'rgba(0,0,0,0.3)', padding: 6, borderRadius: 6, marginBottom: 8 }}>
-                  {location.origin}/api/share/{a.share_token}
+                  {api.publicShareUrl(a.share_token!)}
                 </code>
                 <div style={{ display: 'flex', gap: 6 }}>
                   <button onClick={() => copy(a.share_token!)} style={{ fontSize: '0.78rem' }}>复制</button>

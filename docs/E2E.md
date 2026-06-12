@@ -59,7 +59,7 @@ curl -s http://localhost:3000/api/share/$SHARE | jq
 ### 0.5 短链 /s/:token
 ```bash
 # 浏览器打开下面链接应该看到落地页
-echo "https://your-domain/s/$SHARE"
+echo "https://your-domain/#/s/$SHARE"
 ```
 
 ---
@@ -108,12 +108,14 @@ npx @modelcontextprotocol/inspector node packages/server/dist/mcp/stdio.js
 curl -X POST http://localhost:3000/mcp \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
+  -H "Authorization: Bearer $API_KEY" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | jq
 
 # 调用 list_assets
 curl -X POST http://localhost:3000/mcp \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
+  -H "Authorization: Bearer $API_KEY" \
   -d '{
     "jsonrpc": "2.0",
     "id": 2,

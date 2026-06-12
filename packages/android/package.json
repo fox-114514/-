@@ -6,6 +6,9 @@
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
+    "typecheck": "tsc --noEmit",
+    "build:apk": "eas build -p android --profile preview --local",
+    "build:eas": "eas build -p android --profile preview",
     "build:android": "eas build -p android --profile preview"
   },
   "dependencies": {
@@ -24,6 +27,7 @@
   },
   "devDependencies": {
     "@types/react": "~18.2.79",
+    "eas-cli": "^13.2.3",
     "typescript": "~5.3.3"
   }
 }

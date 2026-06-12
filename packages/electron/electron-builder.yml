@@ -5,6 +5,7 @@ directories:
   buildResources: assets
 files:
   - dist/**/*
+  - package.json
   - '!**/*.map'
 asar: true
 win:

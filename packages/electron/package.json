@@ -5,7 +5,7 @@
   "main": "dist/main.js",
   "scripts": {
     "dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && tsc -p tsconfig.json && electron .\"",
-    "build:web": "vite build",
+    "build:web": "pnpm --filter @cloudasset/web build && node scripts/copy-web-dist.mjs",
     "build:tsc": "tsc -p tsconfig.json",
     "build": "pnpm build:web && pnpm build:tsc",
     "dist": "pnpm build && electron-builder"

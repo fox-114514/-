@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { api, type Asset, formatDate, formatSize } from '../api/client';
+import { api, fetchAssetBlobUrl, type Asset, formatDate, formatSize } from '../api/client';
 
 export default function AssetDetail() {
   const { id } = useParams();
   const [a, setA] = useState<Asset | null>(null);
   const [text, setText] = useState<string | null>(null);
+  const [mediaUrl, setMediaUrl] = useState<string | null>(null);
   const [edit, setEdit] = useState(false);
   const [form, setForm] = useState({ name: '', description: '', category: 'other', tags: '' });
   const [shareUrl, setShareUrl] = useState<string | null>(null);
@@ -13,15 +14,27 @@ export default function AssetDetail() {
 
   useEffect(() => {
     if (!id) return;
+    let objectUrl: string | null = null;
+    let alive = true;
     api.getAsset(id).then(asset => {
+      if (!alive) return;
       setA(asset);
       setForm({ name: asset.name, description: asset.description ?? '', category: asset.category, tags: asset.tags.join(', ') });
       const isText = asset.mime_type.startsWith('text/') || /\.(md|txt|csv|json|xml|yaml|yml|js|ts|py|html|css|sql|sh)$/i.test(asset.name);
       if (isText) {
         fetch(api.contentUrl(asset.id), { headers: { 'X-API-Key': localStorage.getItem('cloudasset_key') || '' } })
-          .then(r => r.text()).then(t => setText(t.slice(0, 200_000)));
+          .then(r => r.text()).then(t => alive && setText(t.slice(0, 200_000)));
+      } else if (asset.mime_type.startsWith('image/') || asset.mime_type.startsWith('video/') || asset.mime_type.startsWith('audio/')) {
+        fetchAssetBlobUrl(asset.id).then(url => {
+          objectUrl = url;
+          if (alive) setMediaUrl(url);
+        });
       }
     });
+    return () => {
+      alive = false;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
   }, [id]);
 
   if (!a) return <div className="content">加载中…</div>;
@@ -35,6 +48,7 @@ export default function AssetDetail() {
 
   const onShare = async () => {
     const r = await api.share(a.id);
+    setA({ ...a, share_token: r.share_token });
     setShareUrl(r.url);
   };
   const onUnshare = async () => {
@@ -70,11 +84,11 @@ export default function AssetDetail() {
                 <button onClick={() => setEdit(true)}>编辑</button>
                 {!a.share_token ? <button onClick={onShare}>生成分享链接</button> : (
                   <>
-                    <button onClick={() => navigator.clipboard.writeText(`${location.origin}/api/share/${a.share_token}`)}>复制分享链接</button>
+                    <button onClick={() => navigator.clipboard.writeText(api.publicShareUrl(a.share_token!))}>复制分享链接</button>
                     <button className="danger" onClick={onUnshare}>取消分享</button>
                   </>
                 )}
-                <a href={api.contentUrl(a.id)} download={a.original_name}><button>下载</button></a>
+                <button onClick={() => api.downloadAsset(a.id, a.original_name)}>下载</button>
                 <button className="danger" onClick={onDelete}>删除</button>
               </div>
               {shareUrl && <div style={{ marginTop: 12, padding: 10, background: 'rgba(52,211,153,0.1)', borderRadius: 8, fontSize: '0.85rem', color: '#6ee7b7' }}>分享 URL: <code>{shareUrl}</code></div>}
@@ -101,11 +115,11 @@ export default function AssetDetail() {
         <div className="card">
           <h3 style={{ marginTop: 0 }}>预览</h3>
           {a.mime_type.startsWith('image/') ? (
-            <div className="preview-box"><img src={api.contentUrl(a.id)} alt={a.name} /></div>
+            <div className="preview-box">{mediaUrl ? <img src={mediaUrl} alt={a.name} /> : '加载预览中...'}</div>
           ) : a.mime_type.startsWith('video/') ? (
-            <div className="preview-box"><video src={api.contentUrl(a.id)} controls style={{ width: '100%' }} /></div>
+            <div className="preview-box">{mediaUrl ? <video src={mediaUrl} controls style={{ width: '100%' }} /> : '加载预览中...'}</div>
           ) : a.mime_type.startsWith('audio/') ? (
-            <div className="preview-box"><audio src={api.contentUrl(a.id)} controls style={{ width: '100%' }} /></div>
+            <div className="preview-box">{mediaUrl ? <audio src={mediaUrl} controls style={{ width: '100%' }} /> : '加载预览中...'}</div>
           ) : text !== null ? (
             <div className="preview-box"><pre>{text}</pre></div>
           ) : (

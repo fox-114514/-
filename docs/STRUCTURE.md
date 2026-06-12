@@ -1,103 +1,94 @@
 # 项目结构
 
-```
+```text
 cloudasset/
 ├── package.json                  # pnpm workspace 根
 ├── pnpm-workspace.yaml
-├── Dockerfile                    # 后端容器化
-├── docker-compose.yml
+├── pnpm-lock.yaml
+├── Dockerfile                    # server / web 多阶段镜像
+├── docker-compose.yml            # 本地构建部署
+├── docker-compose.prod.yml       # 使用 GHCR 镜像部署
+├── .dockerignore
 ├── .env.example
-├── .gitignore
 ├── README.md
 │
+├── .github/workflows/
+│   ├── docker-ghcr.yml           # 构建并推送 GHCR 镜像
+│   └── android-eas.yml           # 手动触发 Android APK 构建
+│
 ├── packages/
-│   ├── server/                   # ★ 后端 + MCP
+│   ├── server/                   # Express + SQLite + MCP
 │   │   ├── package.json
 │   │   ├── tsconfig.json
-│   │   ├── src/
-│   │   │   ├── index.ts          # Express + MCP HTTP 启动入口
-│   │   │   ├── config.ts         # 环境变量
-│   │   │   ├── db/
-│   │   │   │   ├── schema.sql
-│   │   │   │   ├── connection.ts
-│   │   │   │   └── repo.ts
-│   │   │   ├── auth/apiKey.ts
-│   │   │   ├── storage/
-│   │   │   │   ├── local.ts
-│   │   │   │   └── category.ts
-│   │   │   ├── routes/assets.ts  # REST 路由
-│   │   │   └── mcp/
-│   │   │       ├── server.ts     # 8 个 tool 注册
-│   │   │       ├── http.ts       # Streamable HTTP 传输
-│   │   │       └── stdio.ts      # stdio 入口
-│   │   └── files/                # 默认存储根
+│   │   └── src/
+│   │       ├── index.ts          # HTTP 入口
+│   │       ├── config.ts         # 环境变量
+│   │       ├── auth/apiKey.ts    # X-API-Key / Bearer 鉴权
+│   │       ├── db/               # SQLite schema + repo
+│   │       ├── storage/          # 本地文件存储
+│   │       ├── routes/assets.ts  # REST API
+│   │       └── mcp/              # MCP stdio + HTTP
 │   │
-│   ├── web/                      # ★ React + Vite SPA
-│   │   ├── package.json
-│   │   ├── tsconfig.json
-│   │   ├── vite.config.ts
+│   ├── web/                      # React + Vite SPA
+│   │   ├── vite.config.mjs
 │   │   ├── index.html
 │   │   └── src/
 │   │       ├── main.tsx
-│   │       ├── api/client.ts     # 跨客户端 fetch 封装
+│   │       ├── api/client.ts
 │   │       ├── pages/
 │   │       │   ├── Login.tsx
 │   │       │   ├── AssetList.tsx
 │   │       │   ├── AssetDetail.tsx
 │   │       │   ├── Upload.tsx
-│   │       │   └── ShareManager.tsx
-│   │       ├── components/
+│   │       │   ├── ShareManager.tsx
+│   │       │   └── ShareLanding.tsx
 │   │       └── styles/global.css
 │   │
-│   ├── electron/                 # ★ Windows 桌面
-│   │   ├── package.json
-│   │   ├── tsconfig.json
+│   ├── electron/                 # Windows 桌面壳
 │   │   ├── electron-builder.yml
+│   │   ├── scripts/copy-web-dist.mjs
 │   │   └── src/
 │   │       ├── main.ts
 │   │       └── preload.ts
 │   │
-│   └── android/                  # ★ Expo Android
-│       ├── package.json
+│   └── android/                  # Expo Android
 │       ├── app.json
 │       ├── eas.json
-│       ├── tsconfig.json
 │       ├── assets/
+│       │   ├── icon.png
+│       │   └── splash.png
 │       └── src/
 │           ├── App.tsx
-│           ├── types.ts
 │           ├── api/client.ts
 │           └── screens/
-│               ├── LoginScreen.tsx
-│               ├── ListScreen.tsx
-│               ├── UploadScreen.tsx
-│               └── PreviewScreen.tsx
 │
 ├── deploy/
-│   ├── nginx.conf                # 反代 + HTTPS 模板
-│   └── cloudasset.service        # systemd unit
+│   ├── nginx.conf
+│   ├── nginx.web.conf
+│   └── cloudasset.service
 │
 └── docs/
-    ├── API.md                    # REST API 文档
-    ├── MCP.md                    # MCP 工具文档
-    ├── DEPLOY.md                 # 部署指南
-    ├── E2E.md                    # 端到端测试
-    └── STRUCTURE.md              # 本文件
+    ├── USAGE.md
+    ├── API.md
+    ├── MCP.md
+    ├── DEPLOY.md
+    ├── GITHUB_DEPLOY.md
+    ├── ANDROID.md
+    ├── E2E.md
+    └── STRUCTURE.md
 ```
 
-## 端到端数据流
+## 数据流
 
-```
-[用户] ──HTTPS──> [Nginx] ──> [Express :3000]
-                                  │
-                                  ├─> /api/*          → REST CRUD
-                                  └─> /mcp (POST)     → MCP HTTP
-                  
-[AI Agent]
-   ├── stdio: spawn  packages/server/dist/mcp/stdio.js
-   └── HTTP: POST https://host/mcp  (Streamable HTTP)
-                ↓
-         调用 list_assets / upload_asset / share_asset ...
-                ↓
-         Express → SQLite (元数据) + 本地文件 (./files)
+```text
+User/Web/Android/Electron
+  -> HTTPS reverse proxy
+  -> cloudasset-web
+  -> /api/* proxied to cloudasset-server
+  -> SQLite metadata + local files
+
+AI Agent
+  -> stdio MCP or POST /mcp
+  -> API Key / Bearer auth
+  -> same repository and storage layer
 ```

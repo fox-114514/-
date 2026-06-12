@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, RefreshControl, Alert, TextInput } from 'react-native';
-import { api, clearKey, getBase } from '../api/client';
+import { api, clearKey, getBase, getKey } from '../api/client';
 import type { Asset } from '../types';
 
 const fmt = (b: number) => b < 1024 ? b + 'B' : b < 1024 * 1024 ? (b / 1024).toFixed(1) + 'K' : (b / 1024 / 1024).toFixed(1) + 'M';
@@ -10,6 +10,7 @@ export default function ListScreen({ navigation }: any) {
   const [refreshing, setRefreshing] = useState(false);
   const [q, setQ] = useState('');
   const [contentBase, setContentBase] = useState('');
+  const [apiKey, setApiKey] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setRefreshing(true);
@@ -20,7 +21,10 @@ export default function ListScreen({ navigation }: any) {
     setRefreshing(false);
   }, [q]);
 
-  useEffect(() => { getBase().then(setContentBase); }, []);
+  useEffect(() => {
+    getBase().then(setContentBase);
+    getKey().then(setApiKey);
+  }, []);
   useEffect(() => { const t = setTimeout(load, 300); return () => clearTimeout(t); }, [load]);
 
   const logout = async () => {
@@ -56,7 +60,7 @@ export default function ListScreen({ navigation }: any) {
           <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Preview', { id: item.id })}>
             <View style={styles.thumb}>
               {item.mime_type.startsWith('image/') ? (
-                <Image source={{ uri: contentBase + '/api/assets/' + item.id + '/content' }} style={{ width: '100%', height: '100%' }} />
+                <Image source={{ uri: contentBase + '/api/assets/' + item.id + '/content', headers: apiKey ? { 'X-API-Key': apiKey } : undefined }} style={{ width: '100%', height: '100%' }} />
               ) : (
                 <Text style={styles.icon}>{iconFor(item.category)}</Text>
               )}

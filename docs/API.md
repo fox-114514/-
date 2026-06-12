@@ -137,7 +137,7 @@
 ```json
 {
   "share_token": "abc123def456",
-  "url": "https://asset.example.com/api/share/abc123def456"
+  "url": "https://asset.example.com/#/s/abc123def456"
 }
 ```
 
@@ -148,6 +148,16 @@
 ### `GET /api/share/:token` （公开）
 
 无需鉴权访问分享的资产元数据。
+
+### `GET /api/share/:token/content` （公开）
+
+无需鉴权下载或在线预览分享资产的文件内容。
+
+分享页 URL 格式为：
+
+```text
+https://asset.example.com/#/s/<token>
+```
 
 ---
 

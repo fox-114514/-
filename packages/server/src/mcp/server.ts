@@ -1,5 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
+import { nanoid } from 'nanoid';
 import { config } from '../config.js';
 import { db } from '../db/connection.js';
 import { detectCategory } from '../storage/category.js';
@@ -153,9 +154,9 @@ export function createMcpServer(): McpServer {
     async ({ id }) => {
       const row = db.prepare('SELECT share_token FROM assets WHERE id = ?').get(id) as { share_token: string | null } | undefined;
       if (!row) return { content: [{ type: 'text', text: 'Not found' }], isError: true };
-      const token = row.share_token ?? Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+      const token = row.share_token ?? nanoid(24);
       if (!row.share_token) setShareToken(id, token);
-      const url = `${config.publicBaseUrl}/s/${token}`;
+      const url = `${config.publicBaseUrl}/#/s/${token}`;
       return { content: [{ type: 'text', text: JSON.stringify({ token, url }, null, 2) }] };
     }
   );

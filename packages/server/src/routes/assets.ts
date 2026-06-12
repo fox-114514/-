@@ -119,6 +119,18 @@ assetsRouter.post('/assets/upload', apiKeyAuth, upload.single('file'), async (re
   }
 });
 
+assetsRouter.use((err: unknown, _req: Request, res: Response, next: (err?: unknown) => void) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      res.status(413).json({ error: `File exceeds MAX_UPLOAD_MB=${config.maxUploadMB}` });
+      return;
+    }
+    res.status(400).json({ error: err.message });
+    return;
+  }
+  next(err);
+});
+
 const updateSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   description: z.string().max(2000).nullable().optional(),
@@ -153,7 +165,7 @@ assetsRouter.post('/assets/:id/share', apiKeyAuth, (req, res) => {
   if (!row) { res.status(404).json({ error: 'Not found' }); return; }
   const token = row.share_token ?? nanoid(24);
   if (!row.share_token) setShareToken(req.params.id, token);
-  res.json({ share_token: token, url: `${config.publicBaseUrl}/s/${token}` });
+  res.json({ share_token: token, url: `${config.publicBaseUrl}/#/s/${token}` });
 });
 
 assetsRouter.delete('/assets/:id/share', apiKeyAuth, (req, res) => {

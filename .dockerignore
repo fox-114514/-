@@ -1,0 +1,17 @@
+.git
+.corepack
+node_modules
+**/node_modules
+**/dist
+**/release
+packages/server/data
+packages/server/files
+data
+files
+.env
+.env.*
+!.env.example
+npm-debug.log*
+pnpm-debug.log*
+Dockerfile
+docker-compose.override.yml

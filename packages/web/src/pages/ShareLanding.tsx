@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { api as _api } from '../api/client';
-import { getBase } from '../api/client';
 
 interface PublicAsset {
   id: string;
@@ -25,7 +23,7 @@ export default function ShareLanding() {
   const { token } = useParams();
   const [asset, setAsset] = useState<PublicAsset | null>(null);
   const [err, setErr] = useState('');
-  const base = getBase();
+  const base = location.origin;
 
   useEffect(() => {
     fetch(`${base}/api/share/${token}`).then(async r => {

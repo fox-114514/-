@@ -49,6 +49,18 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return res.text() as unknown as T;
 }
 
+export async function fetchAssetBlobUrl(id: string): Promise<string> {
+  const key = getKey();
+  const res = await fetch(api.contentUrl(id), {
+    headers: key ? { 'X-API-Key': key } : {},
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`${res.status} ${res.statusText}: ${text}`);
+  }
+  return URL.createObjectURL(await res.blob());
+}
+
 export const api = {
   listAssets(params: { q?: string; category?: string; tag?: string; page?: number; limit?: number } = {}): Promise<ListResp> {
     const qs = new URLSearchParams();
@@ -57,6 +69,20 @@ export const api = {
   },
   getAsset(id: string): Promise<Asset> { return request<Asset>('/api/assets/' + id); },
   contentUrl(id: string): string { return (getBase() || '') + '/api/assets/' + id + '/content'; },
+  publicShareUrl(token: string): string { return `${getBase() || location.origin}/#/s/${token}`; },
+  async downloadAsset(id: string, filename: string): Promise<void> {
+    const url = await fetchAssetBlobUrl(id);
+    try {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } finally {
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+  },
   async upload(file: File, opts: { name?: string; description?: string; category?: string; tags?: string } = {}): Promise<Asset> {
     const fd = new FormData();
     fd.append('file', file);

@@ -6,8 +6,10 @@ export default function PreviewScreen({ route, navigation }: any) {
   const { id } = route.params;
   const [asset, setAsset] = useState<any>(null);
   const [imgUri, setImgUri] = useState<string | null>(null);
+  const [apiKey, setApiKey] = useState<string | null>(null);
 
   useEffect(() => {
+    getKey().then(setApiKey);
     api.getAsset(id).then(a => {
       setAsset(a);
       if (a.mime_type.startsWith('image/')) {
@@ -44,7 +46,7 @@ export default function PreviewScreen({ route, navigation }: any) {
         <View style={{ width: 50 }} />
       </View>
       <ScrollView contentContainerStyle={{ padding: 16 }}>
-        {imgUri && <Image source={{ uri: imgUri }} style={{ width: '100%', aspectRatio: 1, borderRadius: 8 }} resizeMode="contain" />}
+        {imgUri && <Image source={{ uri: imgUri, headers: apiKey ? { 'X-API-Key': apiKey } : undefined }} style={{ width: '100%', aspectRatio: 1, borderRadius: 8 }} resizeMode="contain" />}
         {asset.mime_type.startsWith('video/') && (
           <Text style={{ color: '#9ca3af' }}>视频请在 Web 端预览</Text>
         )}

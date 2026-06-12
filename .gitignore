@@ -1,6 +1,8 @@
 # dependencies
 node_modules/
 .pnpm-store/
+.corepack/
+.eas-home/
 
 # build outputs
 dist/

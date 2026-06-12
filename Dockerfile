@@ -1,8 +1,11 @@
 # syntax=docker/dockerfile:1.7
 
 # ===== 构建阶段 =====
-FROM node:20-alpine AS builder
+FROM node:20-bookworm-slim AS builder
 WORKDIR /app
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends python3 make g++ ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 
 # 先拷贝 manifest，命中 Docker 缓存
@@ -27,11 +30,13 @@ RUN pnpm --filter @cloudasset/web build
 
 
 # ===== 后端运行时 =====
-FROM node:20-alpine AS server
+FROM node:20-bookworm-slim AS server
 WORKDIR /app
 ENV NODE_ENV=production
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
-RUN apk add --no-cache wget tini
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends python3 make g++ wget tini ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
 COPY package.json pnpm-workspace.yaml ./
 COPY packages/server/package.json packages/server/
