@@ -1,0 +1,40 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build outputs
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# env
+.env
+.env.local
+.env.*.local
+
+# logs
+*.log
+logs/
+
+# editor
+.vscode/
+.idea/
+.DS_Store
+
+# runtime
+*.db
+*.db-journal
+*.sqlite
+files/*
+!files/.gitkeep
+
+# electron
+packages/electron/release/
+packages/electron/dist/
+
+# expo
+packages/android/.expo/
+packages/android/android/build/
+packages/android/ios/build/
+packages/android/.eas/

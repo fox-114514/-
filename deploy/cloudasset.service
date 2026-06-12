@@ -1,0 +1,18 @@
+[Unit]
+Description=CloudAsset - Personal AIGC Asset Library
+After=network.target
+
+[Service]
+Type=simple
+User=cloudasset
+WorkingDirectory=/opt/cloudasset
+Environment=NODE_ENV=production
+EnvironmentFile=/opt/cloudasset/.env
+ExecStart=/usr/bin/node /opt/cloudasset/packages/server/dist/index.js
+Restart=on-failure
+RestartSec=5s
+StandardOutput=append:/var/log/cloudasset/out.log
+StandardError=append:/var/log/cloudasset/err.log
+
+[Install]
+WantedBy=multi-user.target

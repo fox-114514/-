@@ -1,0 +1,22 @@
+appId: com.cloudasset.app
+productName: CloudAsset
+directories:
+  output: release
+  buildResources: assets
+files:
+  - dist/**/*
+  - '!**/*.map'
+asar: true
+win:
+  target: nsis
+  artifactName: ${productName}-${version}-Setup.${ext}
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+mac:
+  target: dmg
+  category: public.app-category.productivity
+linux:
+  target: AppImage
+  category: Office

@@ -1,0 +1,18 @@
+{
+  "name": "cloudasset",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CloudAsset: a self-hosted AIGC asset library with MCP server",
+  "scripts": {
+    "dev:server": "pnpm --filter @cloudasset/server dev",
+    "dev:web": "pnpm --filter @cloudasset/web dev",
+    "build:server": "pnpm --filter @cloudasset/server build",
+    "build:web": "pnpm --filter @cloudasset/web build",
+    "build:all": "pnpm -r build",
+    "mcp:stdio": "pnpm --filter @cloudasset/server mcp:stdio"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@9.0.0"
+}
